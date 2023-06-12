@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Efecto de Mariposas en el Fondo</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+    
+    .mariposas-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1; /* Asegura que el contenedor de mariposas esté por encima del fondo y el texto */
+    }
+    
+    .fondo {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: url('img/fondo.png');
+      background-size: cover;
+      z-index: 0; /* Establece un z-index inferior para el fondo */
+    }
+    
+    .texto {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 24px;
+      color: white;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+      z-index: 2; /* Establece un z-index superior para el texto */
+    }
+    
+    .mariposa {
+      position: absolute;
+      width: 50px;
+      height: 50px;
+      background-image: url('img/mariposa.png');
+      background-size: cover;
+      opacity: 0;
+      animation: volar linear infinite;
+      transition: transform 0.5s;
+    }
+    
+    @keyframes volar {
+      0% {
+        transform: translate(var(--start-x), var(--start-y));
+        opacity: 1;
+      }
+      100% {
+        transform: translate(var(--end-x), var(--end-y));
+        opacity: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="fondo"></div>
+  <div class="texto">MUCKP UP</div>
+  
+  <div class="mariposas-container"></div>
+
+  <script>
+    window.addEventListener('DOMContentLoaded', (event) => {
+      const mariposasContainer = document.querySelector('.mariposas-container');
+      const windowWidth = window.innerWidth;
+      const windowHeight = window.innerHeight;
+      const mariposas = [];
+      
+      function createMariposa() {
+        const mariposa = document.createElement('div');
+        mariposa.classList.add('mariposa');
+        
+        const startX = Math.random() * windowWidth;
+        const startY = Math.random() * windowHeight;
+        const endX = Math.random() * windowWidth;
+        const endY = Math.random() * windowHeight;
+        
+        mariposa.style.setProperty('--start-x', startX + 'px');
+        mariposa.style.setProperty('--start-y', startY + 'px');
+        mariposa.style.setProperty('--end-x', endX + 'px');
+        mariposa.style.setProperty('--end-y', endY + 'px');
+        
+        const distance = Math.sqrt(Math.pow(startX - endX, 2) + Math.pow(startY - endY, 2));
+        const duration = distance / 100 + 3;
+        
+        mariposa.style.animationDuration = duration + 's';
+        mariposa.style.animationDelay = Math.random() * 2 + 's';
+        
+        mariposasContainer.appendChild(mariposa);
+        mariposas.push(mariposa);
+      }
+      
+      // Crear mariposas iniciales
+      for (let i = 0; i < 20; i++) {
+        createMariposa();
+      }
+      
+      // Evento para alejar las mariposas cuando se mueve el mouse
+      window.addEventListener('mousemove', (event) => {
+        const mouseX = event.clientX;
+        const mouseY = event.clientY;
+        
+        for (let i = 0; i < mariposas.length; i++) {
+          const mariposa = mariposas[i];
+          const startX = parseFloat(mariposa.style.getPropertyValue('--start-x'));
+          const startY = parseFloat(mariposa.style.getPropertyValue('--start-y'));
+          
+          const distance = Math.sqrt(Math.pow(mouseX - startX, 2) + Math.pow(mouseY - startY, 2));
+          const angle = Math.atan2(mouseY - startY, mouseX - startX);
+          
+          const newEndX = startX - Math.cos(angle) * distance * 2;
+          const newEndY = startY - Math.sin(angle) * distance * 2;
+          
+          mariposa.style.setProperty('--end-x', newEndX + 'px');
+          mariposa.style.setProperty('--end-y', newEndY + 'px');
+        }
+      });
+      
+      // Evento para crear nuevas mariposas al hacer clic
+      mariposasContainer.addEventListener('click', (event) => {
+        createMariposa();
+      });
+    });
+  </script>
+</body>
+</html>
